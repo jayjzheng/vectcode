@@ -1,0 +1,68 @@
+CodeGraph Project Structure
+===========================
+
+codegraph/
+│
+├── cmd/
+│   └── codegraph/
+│       └── main.go                 # CLI entry point with Cobra commands
+│
+├── pkg/
+│   ├── chunker/
+│   │   └── chunker.go              # CodeChunk type and methods
+│   │
+│   ├── parser/
+│   │   ├── parser.go               # Parser interface
+│   │   └── go.go                   # Go AST parser (FULLY IMPLEMENTED)
+│   │
+│   ├── embedder/
+│   │   ├── embedder.go             # Embedder interface
+│   │   └── openai.go               # OpenAI embeddings (STUB - needs implementation)
+│   │
+│   ├── vectorstore/
+│   │   ├── vectorstore.go          # VectorStore interface
+│   │   └── chroma.go               # Chroma implementation (STUB - needs implementation)
+│   │
+│   ├── indexer/
+│   │   └── indexer.go              # Orchestrates parsing + embedding + storing
+│   │
+│   └── query/
+│       └── query.go                # Query engine with LLM integration
+│
+├── go.mod                          # Go module definition
+├── README.md                       # Main documentation
+├── GETTING_STARTED.md             # Setup and implementation guide
+├── STRUCTURE.txt                  # This file
+├── Makefile                       # Build and dev commands
+├── .gitignore                     # Git ignore rules
+└── config.example.yaml            # Example configuration
+
+Key Files:
+----------
+
+IMPLEMENTED:
+✅ pkg/parser/go.go - Complete Go AST parser with:
+   - Function/method extraction
+   - Struct/interface extraction  
+   - HTTP endpoint detection
+   - HTTP call detection
+   - Import tracking
+   - Documentation extraction
+
+✅ pkg/chunker/chunker.go - CodeChunk data structure
+✅ cmd/codegraph/main.go - CLI framework
+✅ All interfaces defined
+
+TODO:
+🔲 pkg/vectorstore/chroma.go - Add Chroma client
+🔲 pkg/embedder/openai.go - Add OpenAI API calls
+🔲 cmd/codegraph/main.go - Wire up actual implementations
+🔲 Config loading from YAML file
+
+Lines of Code:
+--------------
+Total: ~800 lines of Go code
+  - Go Parser: ~280 lines (complete)
+  - CLI: ~120 lines (framework ready)
+  - Interfaces: ~200 lines
+  - Stubs: ~200 lines

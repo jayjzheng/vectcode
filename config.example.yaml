@@ -1,0 +1,22 @@
+# CodeGraph Configuration
+
+vector_store:
+  type: chroma
+  path: ~/.codegraph/db
+  collection: codegraph
+
+embeddings:
+  provider: openai
+  model: text-embedding-3-small
+  api_key_env: OPENAI_API_KEY
+
+llm:
+  provider: anthropic
+  model: claude-sonnet-4-5-20250929
+  api_key_env: ANTHROPIC_API_KEY
+
+# Optional: Projects to index
+# projects:
+#   - name: my-service
+#     path: ~/projects/my-service
+#     language: go
