@@ -46,16 +46,37 @@ CodeGraph uses a configuration file at `~/.codegraph/config.yaml`:
 vector_store:
   type: chroma
   path: ~/.codegraph/db
-  
+
 embeddings:
-  provider: openai
-  model: text-embedding-3-small
-  api_key_env: OPENAI_API_KEY
+  # Option 1: Ollama (local, free, recommended)
+  provider: ollama
+  model: bge-m3
+  endpoint: http://localhost:11434
+
+  # Option 2: OpenAI (requires API key)
+  # provider: openai
+  # model: text-embedding-3-small
+  # api_key_env: OPENAI_API_KEY
 
 llm:
   provider: anthropic
   model: claude-sonnet-4-5-20250929
   api_key_env: ANTHROPIC_API_KEY
+```
+
+### Setup Ollama (Recommended)
+
+Ollama provides free, local embeddings with no API costs:
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Pull the BGE-M3 embedding model
+ollama pull bge-m3
+
+# Verify it's working
+curl http://localhost:11434/api/embed -d '{"model": "bge-m3", "input": "test"}'
 ```
 
 ## Architecture
@@ -75,7 +96,8 @@ codegraph/
 ## Roadmap
 
 - [x] Project scaffolding
-- [ ] Go parser implementation
+- [x] Go parser implementation (AST-based with HTTP detection)
+- [x] Ollama embedder integration (BGE-M3)
 - [ ] Vector store integration (Chroma)
 - [ ] Basic CLI commands (index, query, list, delete)
 - [ ] Service interaction mapping

@@ -6,9 +6,15 @@ vector_store:
   collection: codegraph
 
 embeddings:
-  provider: openai
-  model: text-embedding-3-small
-  api_key_env: OPENAI_API_KEY
+  # Option 1: Ollama (local, free, recommended)
+  provider: ollama
+  model: bge-m3
+  endpoint: http://localhost:11434
+
+  # Option 2: OpenAI (requires API key)
+  # provider: openai
+  # model: text-embedding-3-small
+  # api_key_env: OPENAI_API_KEY
 
 llm:
   provider: anthropic
