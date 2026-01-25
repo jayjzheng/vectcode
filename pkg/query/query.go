@@ -30,6 +30,14 @@ func New(e embedder.Embedder, vs vectorstore.VectorStore, llmConfig LLMConfig) *
 	}
 }
 
+// NewEngine creates a query engine without LLM config (for basic queries)
+func NewEngine(e embedder.Embedder, vs vectorstore.VectorStore) *Engine {
+	return &Engine{
+		embedder:    e,
+		vectorStore: vs,
+	}
+}
+
 func (q *Engine) Query(ctx context.Context, queryText string, limit int, filters map[string]interface{}) ([]vectorstore.SearchResult, error) {
 	queryEmbedding, err := q.embedder.Embed(ctx, queryText)
 	if err != nil {

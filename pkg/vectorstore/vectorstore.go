@@ -2,7 +2,8 @@ package vectorstore
 
 import (
 	"context"
-	
+	"fmt"
+
 	"github.com/yourusername/codegraph/pkg/chunker"
 )
 
@@ -30,4 +31,14 @@ type Config struct {
 	Path       string            `yaml:"path"`
 	Collection string            `yaml:"collection"`
 	Options    map[string]string `yaml:"options"`
+}
+
+// New creates a vector store based on the type in the config
+func New(config Config) (VectorStore, error) {
+	switch config.Type {
+	case "chroma":
+		return NewChromaStore(config)
+	default:
+		return nil, fmt.Errorf("unsupported vector store type: %s", config.Type)
+	}
 }

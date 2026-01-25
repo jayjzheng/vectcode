@@ -18,24 +18,49 @@ go install github.com/yourusername/codegraph/cmd/codegraph@latest
 
 ## Quick Start
 
-### Index a project
+### 1. Build the CLI
+
 ```bash
-codegraph index --path ~/projects/my-service --name my-service
+go build -o codegraph ./cmd/codegraph
 ```
 
-### Query the codebase
+### 2. Setup Configuration
+
 ```bash
-codegraph query "where is the user authentication handler?"
+mkdir -p ~/.codegraph
+cp config.example.yaml ~/.codegraph/config.yaml
 ```
 
-### List indexed projects
+### 3. Index a Project
+
 ```bash
-codegraph list
+./codegraph index --path ~/projects/my-service --name my-service
 ```
 
-### Delete a project
+### 4. Query the Codebase
+
 ```bash
-codegraph delete --name my-service
+./codegraph query --query "where is the user authentication handler?" --limit 5
+```
+
+### 5. List Indexed Projects
+
+```bash
+./codegraph list
+```
+
+### 6. Delete a Project
+
+```bash
+./codegraph delete --name my-service
+```
+
+### CLI Options
+
+All commands support a `--config` flag to specify a custom config file:
+
+```bash
+./codegraph --config /path/to/config.yaml index --path . --name myproject
 ```
 
 ## Configuration
