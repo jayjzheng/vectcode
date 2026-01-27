@@ -1,59 +1,104 @@
 # CodeGraph
 
-A code knowledge base tool that ingests multiple code repositories and creates a queryable vector store for LLM-powered code understanding.
+A semantic code search tool that indexes code repositories into a vector database, enabling natural language search across your codebase.
 
 ## Features
 
 - **Multi-repository indexing**: Index multiple Go projects into a unified knowledge base
-- **Semantic search**: Query your codebase using natural language
-- **Service mapping**: Understand how microservices interact with each other
-- **Flow tracing**: Trace request flows across services
-- **RAG-powered**: Uses vector embeddings and LLM for intelligent code understanding
+- **Semantic search**: Query your codebase using natural language via vector embeddings
+- **ChromaDB integration**: Fast vector storage and retrieval
+- **MCP Server**: Use CodeGraph with Claude Desktop and other LLM clients via Model Context Protocol
+- **Ollama embeddings**: Free, local embeddings with BGE-M3 model (or OpenAI alternative)
 
 ## Installation
 
+### Prerequisites
+
+1. **ChromaDB** - Vector database server:
+   ```bash
+   docker run -d -p 8000:8000 chromadb/chroma
+   ```
+
+2. **Ollama** (recommended) - Local embedding model:
+   ```bash
+   # Install Ollama
+   curl -fsSL https://ollama.com/install.sh | sh
+
+   # Pull the BGE-M3 embedding model
+   ollama pull bge-m3
+   ```
+
+### Build from Source
+
 ```bash
-go install github.com/yourusername/codegraph/cmd/codegraph@latest
+# Build CLI tool
+go build -o codegraph ./cmd/codegraph
+
+# Build MCP server (optional, for Claude Desktop integration)
+go build -o codegraph-mcp-server ./cmd/mcp-server
 ```
 
 ## Quick Start
 
-### 1. Build the CLI
-
-```bash
-go build -o codegraph ./cmd/codegraph
-```
-
-### 2. Setup Configuration
+### 1. Setup Configuration
 
 ```bash
 mkdir -p ~/.codegraph
 cp config.example.yaml ~/.codegraph/config.yaml
 ```
 
-### 3. Index a Project
+Edit `~/.codegraph/config.yaml` to configure ChromaDB and Ollama endpoints.
+
+### 2. Index a Project
 
 ```bash
 ./codegraph index --path ~/projects/my-service --name my-service
 ```
 
-### 4. Query the Codebase
+### 3. Query the Codebase
 
 ```bash
 ./codegraph query --query "where is the user authentication handler?" --limit 5
 ```
 
-### 5. List Indexed Projects
+### 4. List Indexed Projects
 
 ```bash
 ./codegraph list
 ```
 
-### 6. Delete a Project
+### 5. Delete a Project
 
 ```bash
 ./codegraph delete --name my-service
 ```
+
+## MCP Server (Claude Desktop Integration)
+
+CodeGraph can be used as an MCP (Model Context Protocol) server, allowing Claude Desktop and other LLM clients to search your indexed codebases during conversations.
+
+See [MCP_SETUP.md](MCP_SETUP.md) for detailed setup instructions.
+
+**Quick setup for Claude Desktop (macOS)**:
+
+1. Build the MCP server:
+   ```bash
+   go build -o codegraph-mcp-server ./cmd/mcp-server
+   sudo cp codegraph-mcp-server /usr/local/bin/
+   ```
+
+2. Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+   ```json
+   {
+     "mcpServers": {
+       "codegraph": {
+         "command": "/usr/local/bin/codegraph-mcp-server"
+       }
+     }
+   }
+   ```
+
+3. Restart Claude Desktop and start searching your code!
 
 ### CLI Options
 
@@ -70,7 +115,9 @@ CodeGraph uses a configuration file at `~/.codegraph/config.yaml`:
 ```yaml
 vector_store:
   type: chroma
-  path: ~/.codegraph/db
+  collection: codegraph
+  options:
+    endpoint: http://localhost:8000
 
 embeddings:
   # Option 1: Ollama (local, free, recommended)
@@ -82,53 +129,73 @@ embeddings:
   # provider: openai
   # model: text-embedding-3-small
   # api_key_env: OPENAI_API_KEY
-
-llm:
-  provider: anthropic
-  model: claude-sonnet-4-5-20250929
-  api_key_env: ANTHROPIC_API_KEY
-```
-
-### Setup Ollama (Recommended)
-
-Ollama provides free, local embeddings with no API costs:
-
-```bash
-# Install Ollama
-curl -fsSL https://ollama.com/install.sh | sh
-
-# Pull the BGE-M3 embedding model
-ollama pull bge-m3
-
-# Verify it's working
-curl http://localhost:11434/api/embed -d '{"model": "bge-m3", "input": "test"}'
 ```
 
 ## Architecture
 
 ```
 codegraph/
-├── cmd/codegraph/      # CLI entry point
+├── cmd/
+│   ├── codegraph/      # CLI entry point
+│   └── mcp-server/     # MCP server for LLM integration
 ├── pkg/
 │   ├── parser/         # Code parsing (AST analysis)
 │   ├── chunker/        # Code chunking logic
-│   ├── embedder/       # Generate embeddings
-│   ├── vectorstore/    # Vector store interface and implementations
+│   ├── embedder/       # Generate embeddings (Ollama/OpenAI)
+│   ├── vectorstore/    # Vector store interface and ChromaDB implementation
 │   ├── indexer/        # Orchestrates parsing and storing
-│   └── query/          # Query interface and LLM integration
+│   ├── query/          # Query engine for semantic search
+│   ├── config/         # Configuration management
+│   └── mcp/            # MCP protocol and server implementation
 ```
+
+## How It Works
+
+1. **Parsing**: CodeGraph parses Go source files using AST analysis to extract:
+   - Functions and methods
+   - Struct and interface definitions
+   - Constants and global variables
+   - Documentation strings
+
+2. **Chunking**: Each code element (function, struct, etc.) is extracted as a separate chunk with:
+   - Code content
+   - File path and line numbers
+   - Documentation
+   - Type information
+
+3. **Embedding**: Code chunks are converted to vector embeddings using:
+   - Ollama with BGE-M3 model (local, free)
+   - Or OpenAI's text-embedding models
+
+4. **Storage**: Embeddings and metadata are stored in ChromaDB for fast similarity search
+
+5. **Querying**: Natural language queries are embedded and matched against stored code chunks using cosine similarity
+
+## Supported Languages
+
+Currently supported:
+- **Go**: Full AST-based parsing with function, method, struct, and interface extraction
+
+## Use Cases
+
+- **Code Discovery**: Find relevant code examples across multiple repositories
+- **Onboarding**: Help new team members understand codebase structure
+- **Refactoring**: Find all usages and similar patterns
+- **Documentation**: Locate functions and their documentation
+- **LLM Integration**: Use with Claude Desktop for AI-powered code assistance
 
 ## Roadmap
 
 - [x] Project scaffolding
-- [x] Go parser implementation (AST-based with HTTP detection)
+- [x] Go parser implementation (AST-based)
 - [x] Ollama embedder integration (BGE-M3)
-- [ ] Vector store integration (Chroma)
-- [ ] Basic CLI commands (index, query, list, delete)
-- [ ] Service interaction mapping
-- [ ] Flow tracing
-- [ ] Visualization (Mermaid diagrams)
-- [ ] Support for additional languages (TypeScript, Python)
+- [x] ChromaDB vector store integration
+- [x] Basic CLI commands (index, query, list, delete)
+- [x] MCP server for Claude Desktop integration
+- [ ] Support for additional languages (TypeScript, Python, Rust)
+- [ ] Incremental indexing (detect and index only changed files)
+- [ ] Multi-language project support
+- [ ] Enhanced metadata filtering
 
 ## Contributing
 

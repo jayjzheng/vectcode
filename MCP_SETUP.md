@@ -1,0 +1,215 @@
+# CodeGraph MCP Server Setup
+
+This guide shows you how to use CodeGraph as an MCP (Model Context Protocol) server with Claude Desktop and other LLM clients.
+
+## What is MCP?
+
+MCP (Model Context Protocol) allows LLMs like Claude to access external tools and data sources during conversations. With CodeGraph as an MCP server, Claude can search through your indexed codebases in real-time.
+
+## Prerequisites
+
+1. **CodeGraph with indexed projects**:
+   ```bash
+   # Make sure you've indexed some projects
+   ./codegraph list
+   ```
+
+2. **MCP server binary**:
+   ```bash
+   # Build the MCP server
+   go build -o codegraph-mcp-server ./cmd/mcp-server
+
+   # Move to a permanent location (optional)
+   sudo cp codegraph-mcp-server /usr/local/bin/
+   ```
+
+3. **Running services**:
+   - ChromaDB at `http://localhost:8000`
+   - Ollama at `http://localhost:11434` with `bge-m3` model
+
+## Setup for Claude Desktop
+
+### 1. Find Claude Desktop Config Location
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+**Linux**: `~/.config/Claude/claude_desktop_config.json`
+
+### 2. Configure the MCP Server
+
+Edit your `claude_desktop_config.json` file:
+
+```json
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "/path/to/codegraph-mcp-server",
+      "env": {
+        "CODEGRAPH_CONFIG": "/Users/yourusername/.codegraph/config.yaml"
+      }
+    }
+  }
+}
+```
+
+**Important**: Replace `/path/to/codegraph-mcp-server` with the actual path to your binary.
+
+#### Example (macOS):
+
+```json
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "/usr/local/bin/codegraph-mcp-server"
+    }
+  }
+}
+```
+
+Or if using the binary from your project directory:
+
+```json
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "/Users/jayzheng/projects/codegraph/codegraph-mcp-server"
+    }
+  }
+}
+```
+
+### 3. Restart Claude Desktop
+
+Close and reopen Claude Desktop for the changes to take effect.
+
+### 4. Verify Connection
+
+In Claude Desktop, you should see a 🔨 (hammer) icon indicating MCP tools are available. Click it to see the CodeGraph tools:
+
+- **search_code**: Search indexed codebases
+- **list_projects**: List all indexed projects
+
+## Using CodeGraph in Claude Conversations
+
+Once configured, you can ask Claude to search your code:
+
+### Example Conversations:
+
+**List projects**:
+> "What projects are indexed in CodeGraph?"
+
+**Search code**:
+> "Search for functions that fetch team data"
+> "Find the API client implementation"
+> "Show me SQL insert operations"
+
+**Project-specific search**:
+> "Search the nflcom project for database operations"
+
+**Code understanding**:
+> "How does the team data fetching work in my codebase?"
+
+Claude will use the `search_code` tool to find relevant code chunks and provide detailed answers based on your actual code.
+
+## Available MCP Tools
+
+### 1. search_code
+
+Searches indexed codebases using semantic search.
+
+**Parameters**:
+- `query` (required): Natural language search query
+- `project` (optional): Filter to specific project name
+- `limit` (optional): Max results to return (default: 5)
+
+**Returns**: Code chunks with file paths, line numbers, documentation, and code content.
+
+### 2. list_projects
+
+Lists all indexed projects available for search.
+
+**Parameters**: None
+
+**Returns**: List of project names.
+
+## Troubleshooting
+
+### MCP Server Not Showing in Claude Desktop
+
+1. Check the config file path is correct
+2. Verify the binary path is absolute (not relative)
+3. Check Claude Desktop logs:
+   - macOS: `~/Library/Logs/Claude/`
+   - Windows: `%APPDATA%\Claude\logs\`
+
+### "Connection failed" Error
+
+1. Ensure ChromaDB is running:
+   ```bash
+   curl http://localhost:8000/api/v1/heartbeat
+   ```
+
+2. Ensure Ollama is running:
+   ```bash
+   curl http://localhost:11434/api/tags
+   ```
+
+3. Test MCP server manually:
+   ```bash
+   echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | ./codegraph-mcp-server
+   ```
+
+### No Projects Found
+
+Index some projects first:
+```bash
+./codegraph index --path ~/projects/myproject --name myproject
+./codegraph list
+```
+
+## Configuration
+
+The MCP server uses the same config as the CLI tool: `~/.codegraph/config.yaml`
+
+You can override the config path with the `CODEGRAPH_CONFIG` environment variable in your Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "/path/to/codegraph-mcp-server",
+      "env": {
+        "CODEGRAPH_CONFIG": "/custom/path/to/config.yaml"
+      }
+    }
+  }
+}
+```
+
+## Example Claude Desktop Config (Complete)
+
+```json
+{
+  "mcpServers": {
+    "codegraph": {
+      "command": "/usr/local/bin/codegraph-mcp-server",
+      "env": {
+        "CODEGRAPH_CONFIG": "/Users/jayzheng/.codegraph/config.yaml"
+      }
+    }
+  }
+}
+```
+
+## Next Steps
+
+Once configured, Claude can:
+- Search your codebases during conversations
+- Find relevant code examples
+- Answer questions about your code architecture
+- Help with debugging by finding similar implementations
+- Provide context-aware coding suggestions
+
+Try asking Claude: "Search my code for API authentication logic" or "Show me how database connections are handled in the nflcom project."
