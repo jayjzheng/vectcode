@@ -54,6 +54,7 @@ func indexCmd() *cobra.Command {
 	var (
 		projectPath string
 		projectName string
+		clean       bool
 	)
 
 	cmd := &cobra.Command{
@@ -96,8 +97,18 @@ func indexCmd() *cobra.Command {
 			// Create indexer
 			idx := indexer.New(parser, emb, store)
 
-			// Run indexing
 			ctx := context.Background()
+
+			// Clean re-index: delete existing project first
+			if clean {
+				fmt.Printf("Cleaning existing data for project: %s\n", projectName)
+				if err := idx.DeleteProject(ctx, projectName); err != nil {
+					// Don't fail if project doesn't exist
+					fmt.Printf("Note: Could not delete existing project (may not exist): %v\n", err)
+				}
+			}
+
+			// Run indexing
 			if err := idx.IndexProject(ctx, projectPath, projectName); err != nil {
 				return fmt.Errorf("indexing failed: %w", err)
 			}
@@ -108,6 +119,7 @@ func indexCmd() *cobra.Command {
 
 	cmd.Flags().StringVarP(&projectPath, "path", "p", "", "Path to the project directory (required)")
 	cmd.Flags().StringVarP(&projectName, "name", "n", "", "Name of the project (required)")
+	cmd.Flags().BoolVar(&clean, "clean", false, "Delete existing project data before indexing (ensures no orphaned chunks)")
 
 	return cmd
 }
