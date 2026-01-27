@@ -74,14 +74,29 @@ func (s *Server) Run(input io.Reader, output io.Writer) error {
 		}
 
 		resp := s.handleRequest(req)
-		if err := WriteResponse(output, resp); err != nil {
-			return fmt.Errorf("failed to write response: %w", err)
+		// Only write response if there is one (notifications return nil)
+		if resp != nil {
+			if err := WriteResponse(output, resp); err != nil {
+				return fmt.Errorf("failed to write response: %w", err)
+			}
 		}
 	}
 }
 
 // handleRequest processes a JSON-RPC request
 func (s *Server) handleRequest(req *JSONRPCRequest) *JSONRPCResponse {
+	// Check if this is a notification (no response needed)
+	if req.ID == nil {
+		// Notifications don't get responses, just handle them silently
+		switch req.Method {
+		case "notifications/initialized":
+			// Client initialized, nothing to do
+		case "notifications/cancelled":
+			// Request cancelled, nothing to do
+		}
+		return nil
+	}
+
 	switch req.Method {
 	case "initialize":
 		return s.handleInitialize(req)
