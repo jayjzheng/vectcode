@@ -135,6 +135,7 @@ func (c *ChromaStore) Search(ctx context.Context, queryEmbedding []float64, limi
 	opts := []chroma.QueryOption{
 		chroma.WithQueryEmbeddings(queryEmb),
 		chroma.WithNResults(limit),
+		chroma.WithIncludeQuery(chroma.IncludeMetadatas, chroma.IncludeDocuments, chroma.IncludeDistances),
 	}
 
 	// Add where clause if filters provided
@@ -324,8 +325,8 @@ func chunkToMetadata(chunk chunker.CodeChunk) chroma.DocumentMetadata {
 		chroma.NewStringAttribute("language", chunk.Language),
 		chroma.NewStringAttribute("chunk_type", string(chunk.ChunkType)),
 		chroma.NewStringAttribute("name", chunk.Name),
-		chroma.NewIntAttribute("line_start", int64(chunk.LineStart)),
-		chroma.NewIntAttribute("line_end", int64(chunk.LineEnd)),
+		chroma.NewStringAttribute("line_start", fmt.Sprintf("%d", chunk.LineStart)),
+		chroma.NewStringAttribute("line_end", fmt.Sprintf("%d", chunk.LineEnd)),
 	)
 
 	// Add optional string fields
@@ -429,10 +430,13 @@ func getStringMeta(metadata chroma.DocumentMetadata, key string) string {
 	return ""
 }
 
-// getIntMeta extracts an int value from metadata
+// getIntMeta extracts an int value from metadata (stored as string)
 func getIntMeta(metadata chroma.DocumentMetadata, key string) int {
-	if val, ok := metadata.GetInt(key); ok {
-		return int(val)
+	// ChromaDB stores integers as strings, so we need to parse them
+	if val, ok := metadata.GetString(key); ok && val != "" {
+		var result int
+		fmt.Sscanf(val, "%d", &result)
+		return result
 	}
 	return 0
 }

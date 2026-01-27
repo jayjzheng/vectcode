@@ -111,7 +111,7 @@ func (p *GoParser) parseFile(filePath string, projectName string) ([]chunker.Cod
 func (p *GoParser) extractFunction(fset *token.FileSet, fn *ast.FuncDecl, filePath, projectName, packageName string, imports []string, modTime time.Time) chunker.CodeChunk {
 	var buf bytes.Buffer
 	printer.Fprint(&buf, fset, fn)
-	
+
 	chunk := chunker.CodeChunk{
 		ID:           generateID(projectName, filePath, fn.Name.Name),
 		Project:      projectName,
