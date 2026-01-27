@@ -11,10 +11,8 @@ import (
 	"github.com/yourusername/codegraph/pkg/config"
 	"github.com/yourusername/codegraph/pkg/embedder"
 	"github.com/yourusername/codegraph/pkg/indexer"
-	"github.com/yourusername/codegraph/pkg/llm"
 	"github.com/yourusername/codegraph/pkg/parser"
 	"github.com/yourusername/codegraph/pkg/query"
-	"github.com/yourusername/codegraph/pkg/rag"
 	"github.com/yourusername/codegraph/pkg/vectorstore"
 )
 
@@ -43,7 +41,6 @@ vector store for LLM-powered code understanding.`,
 
 	rootCmd.AddCommand(indexCmd())
 	rootCmd.AddCommand(queryCmd())
-	rootCmd.AddCommand(askCmd())
 	rootCmd.AddCommand(listCmd())
 	rootCmd.AddCommand(deleteCmd())
 
@@ -277,82 +274,6 @@ func deleteCmd() *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&projectName, "name", "n", "", "Name of the project to delete (required)")
-
-	return cmd
-}
-
-func askCmd() *cobra.Command {
-	var (
-		question    string
-		projectName string
-		topK        int
-		maxContext  int
-	)
-
-	cmd := &cobra.Command{
-		Use:   "ask",
-		Short: "Ask a question about your codebase using RAG",
-		Long:  `Ask a natural language question and get an AI-generated answer based on your indexed code`,
-		RunE: func(cmd *cobra.Command, args []string) error {
-			if question == "" {
-				return fmt.Errorf("--question is required")
-			}
-
-			// Load configuration
-			cfg, err := config.LoadOrDefault(getConfigPath())
-			if err != nil {
-				return fmt.Errorf("failed to load config: %w", err)
-			}
-
-			fmt.Printf("Question: %s\n\n", question)
-
-			// Initialize components
-			emb, err := embedder.New(cfg.Embeddings)
-			if err != nil {
-				return fmt.Errorf("failed to create embedder: %w", err)
-			}
-
-			store, err := vectorstore.New(cfg.ToVectorStoreConfig())
-			if err != nil {
-				return fmt.Errorf("failed to create vector store: %w", err)
-			}
-			defer store.Close()
-
-			llmClient, err := llm.New(cfg.LLM)
-			if err != nil {
-				return fmt.Errorf("failed to create LLM client: %w", err)
-			}
-
-			// Create RAG engine
-			ragEngine := rag.New(emb, store, llmClient)
-
-			// Prepare options
-			opts := rag.AskOptions{
-				Project:          projectName,
-				TopK:             topK,
-				MaxContextChunks: maxContext,
-			}
-
-			// Execute query
-			ctx := context.Background()
-			answer, err := ragEngine.Ask(ctx, question, opts)
-			if err != nil {
-				return fmt.Errorf("failed to get answer: %w", err)
-			}
-
-			// Display answer
-			fmt.Println("\n=== Answer ===\n")
-			fmt.Println(answer)
-			fmt.Println()
-
-			return nil
-		},
-	}
-
-	cmd.Flags().StringVarP(&question, "question", "q", "", "Question to ask (required)")
-	cmd.Flags().StringVarP(&projectName, "project", "p", "", "Filter by project name")
-	cmd.Flags().IntVarP(&topK, "top-k", "k", 10, "Number of code chunks to retrieve")
-	cmd.Flags().IntVarP(&maxContext, "max-context", "m", 5, "Maximum code chunks to include in context")
 
 	return cmd
 }

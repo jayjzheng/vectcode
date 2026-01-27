@@ -15,7 +15,6 @@ import (
 type Config struct {
 	VectorStore VectorStoreConfig `yaml:"vector_store"`
 	Embeddings  embedder.Config   `yaml:"embeddings"`
-	LLM         LLMConfig         `yaml:"llm"`
 }
 
 // VectorStoreConfig holds vector store configuration
@@ -24,13 +23,6 @@ type VectorStoreConfig struct {
 	Path       string            `yaml:"path"`
 	Collection string            `yaml:"collection"`
 	Options    map[string]string `yaml:"options"`
-}
-
-// LLMConfig holds LLM configuration
-type LLMConfig struct {
-	Provider  string `yaml:"provider"`
-	Model     string `yaml:"model"`
-	APIKeyEnv string `yaml:"api_key_env"`
 }
 
 // Load reads and parses the configuration file
@@ -95,11 +87,6 @@ func DefaultConfig() *Config {
 			Provider: "ollama",
 			Model:    "bge-m3",
 			Endpoint: "http://localhost:11434",
-		},
-		LLM: LLMConfig{
-			Provider:  "anthropic",
-			Model:     "claude-sonnet-4-5-20250929",
-			APIKeyEnv: "ANTHROPIC_API_KEY",
 		},
 	}
 }

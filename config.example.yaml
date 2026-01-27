@@ -4,6 +4,8 @@ vector_store:
   type: chroma
   path: ~/.codegraph/db
   collection: codegraph
+  options:
+    endpoint: http://localhost:8000
 
 embeddings:
   # Option 1: Ollama (local, free, recommended)
@@ -15,11 +17,6 @@ embeddings:
   # provider: openai
   # model: text-embedding-3-small
   # api_key_env: OPENAI_API_KEY
-
-llm:
-  provider: anthropic
-  model: claude-sonnet-4-5-20250929
-  api_key_env: ANTHROPIC_API_KEY
 
 # Optional: Projects to index
 # projects:
