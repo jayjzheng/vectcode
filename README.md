@@ -55,6 +55,12 @@ Edit `~/.codegraph/config.yaml` to configure ChromaDB and Ollama endpoints.
 ./codegraph index --path ~/projects/my-service --name my-service
 ```
 
+**Re-indexing with clean slate:**
+```bash
+# Use --clean to delete existing data first (removes orphaned chunks from deleted code)
+./codegraph index --path ~/projects/my-service --name my-service --clean
+```
+
 ### 3. Query the Codebase
 
 ```bash
@@ -183,6 +189,25 @@ Currently supported:
 - **Refactoring**: Find all usages and similar patterns
 - **Documentation**: Locate functions and their documentation
 - **LLM Integration**: Use with Claude Desktop for AI-powered code assistance
+
+## Re-indexing Behavior
+
+When you re-index a project, CodeGraph uses deterministic IDs (based on `project:file:name`) to handle updates:
+
+**Without `--clean` flag:**
+- Existing code chunks are **updated** (upsert behavior)
+- New code chunks are **added**
+- ⚠️ **Orphaned chunks remain**: If you delete code from your project, those chunks stay in the database
+
+**With `--clean` flag:**
+- All existing project data is **deleted first**
+- Then indexes from scratch
+- ✅ **No orphaned chunks**: Ensures database exactly matches current code state
+
+**When to use `--clean`:**
+- After deleting or renaming files/functions
+- When you want to ensure a fresh, accurate index
+- Troubleshooting stale search results
 
 ## Roadmap
 
