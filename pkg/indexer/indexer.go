@@ -25,34 +25,34 @@ func New(p parser.Parser, e embedder.Embedder, vs vectorstore.VectorStore) *Inde
 	}
 }
 
-func (i *Indexer) IndexProject(ctx context.Context, projectPath string, projectName string) error {
+func (i *Indexer) IndexProject(ctx context.Context, projectPath string, projectName string) (int, error) {
 	fmt.Printf("Parsing project: %s\n", projectName)
-	
+
 	chunks, err := i.parser.Parse(ctx, projectPath, projectName)
 	if err != nil {
-		return fmt.Errorf("failed to parse project: %w", err)
+		return 0, fmt.Errorf("failed to parse project: %w", err)
 	}
-	
+
 	if len(chunks) == 0 {
-		return fmt.Errorf("no code chunks found in project")
+		return 0, fmt.Errorf("no code chunks found in project")
 	}
-	
+
 	fmt.Printf("Found %d code chunks\n", len(chunks))
 	fmt.Printf("Generating embeddings...\n")
-	
+
 	embeddings, err := i.generateEmbeddings(ctx, chunks)
 	if err != nil {
-		return fmt.Errorf("failed to generate embeddings: %w", err)
+		return 0, fmt.Errorf("failed to generate embeddings: %w", err)
 	}
-	
+
 	fmt.Printf("Storing in vector database...\n")
 	err = i.vectorStore.InsertBatch(ctx, chunks, embeddings)
 	if err != nil {
-		return fmt.Errorf("failed to store chunks: %w", err)
+		return 0, fmt.Errorf("failed to store chunks: %w", err)
 	}
-	
+
 	fmt.Printf("Successfully indexed project: %s\n", projectName)
-	return nil
+	return len(chunks), nil
 }
 
 func (i *Indexer) DeleteProject(ctx context.Context, projectName string) error {

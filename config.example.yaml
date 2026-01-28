@@ -18,6 +18,9 @@ embeddings:
   # model: text-embedding-3-small
   # api_key_env: OPENAI_API_KEY
 
+metadata:
+  db_path: ~/.codegraph/metadata.db
+
 # Optional: Projects to index
 # projects:
 #   - name: my-service

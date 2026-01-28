@@ -15,6 +15,7 @@ import (
 type Config struct {
 	VectorStore VectorStoreConfig `yaml:"vector_store"`
 	Embeddings  embedder.Config   `yaml:"embeddings"`
+	Metadata    MetadataConfig    `yaml:"metadata"`
 }
 
 // VectorStoreConfig holds vector store configuration
@@ -23,6 +24,11 @@ type VectorStoreConfig struct {
 	Path       string            `yaml:"path"`
 	Collection string            `yaml:"collection"`
 	Options    map[string]string `yaml:"options"`
+}
+
+// MetadataConfig holds metadata store configuration
+type MetadataConfig struct {
+	DBPath string `yaml:"db_path"`
 }
 
 // Load reads and parses the configuration file
@@ -57,6 +63,15 @@ func Load(configPath string) (*Config, error) {
 		cfg.VectorStore.Path = filepath.Join(home, cfg.VectorStore.Path[2:])
 	}
 
+	// Expand ~ in metadata DB path
+	if len(cfg.Metadata.DBPath) > 0 && cfg.Metadata.DBPath[:2] == "~/" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get home directory: %w", err)
+		}
+		cfg.Metadata.DBPath = filepath.Join(home, cfg.Metadata.DBPath[2:])
+	}
+
 	return &cfg, nil
 }
 
@@ -76,6 +91,7 @@ func LoadOrDefault(configPath string) (*Config, error) {
 func DefaultConfig() *Config {
 	home, _ := os.UserHomeDir()
 	dbPath := filepath.Join(home, ".codegraph", "db")
+	metadataPath := filepath.Join(home, ".codegraph", "metadata.db")
 
 	return &Config{
 		VectorStore: VectorStoreConfig{
@@ -87,6 +103,9 @@ func DefaultConfig() *Config {
 			Provider: "ollama",
 			Model:    "bge-m3",
 			Endpoint: "http://localhost:11434",
+		},
+		Metadata: MetadataConfig{
+			DBPath: metadataPath,
 		},
 	}
 }

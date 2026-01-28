@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/cobra"
 
 	"github.com/yourusername/codegraph/pkg/config"
 	"github.com/yourusername/codegraph/pkg/embedder"
 	"github.com/yourusername/codegraph/pkg/indexer"
+	"github.com/yourusername/codegraph/pkg/metadata"
 	"github.com/yourusername/codegraph/pkg/parser"
 	"github.com/yourusername/codegraph/pkg/query"
 	"github.com/yourusername/codegraph/pkg/vectorstore"
@@ -54,6 +56,8 @@ func indexCmd() *cobra.Command {
 	var (
 		projectPath string
 		projectName string
+		groupName   string
+		description string
 		clean       bool
 	)
 
@@ -76,6 +80,13 @@ func indexCmd() *cobra.Command {
 			}
 
 			fmt.Printf("Indexing project: %s from path: %s\n", projectName, projectPath)
+
+			// Initialize metadata store
+			metaStore, err := metadata.NewSQLiteStore(cfg.Metadata.DBPath)
+			if err != nil {
+				return fmt.Errorf("failed to create metadata store: %w", err)
+			}
+			defer metaStore.Close()
 
 			// Initialize components
 			fmt.Println("Initializing embedder...")
@@ -106,11 +117,53 @@ func indexCmd() *cobra.Command {
 					// Don't fail if project doesn't exist
 					fmt.Printf("Note: Could not delete existing project (may not exist): %v\n", err)
 				}
+				// Also delete from metadata store
+				metaStore.DeleteProject(ctx, projectName)
 			}
 
 			// Run indexing
-			if err := idx.IndexProject(ctx, projectPath, projectName); err != nil {
+			chunkCount, err := idx.IndexProject(ctx, projectPath, projectName)
+			if err != nil {
 				return fmt.Errorf("indexing failed: %w", err)
+			}
+
+			// Record metadata
+			now := time.Now()
+			project := &metadata.Project{
+				Name:          projectName,
+				Path:          projectPath,
+				Language:      parser.Language(),
+				Description:   description,
+				ChunkCount:    chunkCount,
+				LastIndexedAt: &now,
+			}
+
+			// Get group ID if group specified
+			if groupName != "" {
+				group, err := metaStore.GetGroup(ctx, groupName)
+				if err != nil {
+					// Group doesn't exist, create it
+					group, err = metaStore.CreateGroup(ctx, groupName, "")
+					if err != nil {
+						return fmt.Errorf("failed to create group: %w", err)
+					}
+				}
+				project.GroupID = &group.ID
+			}
+
+			// Check if project exists
+			existing, err := metaStore.GetProject(ctx, projectName)
+			if err == nil {
+				// Update existing project
+				project.ID = existing.ID
+				if err := metaStore.UpdateProject(ctx, project); err != nil {
+					return fmt.Errorf("failed to update project metadata: %w", err)
+				}
+			} else {
+				// Create new project
+				if err := metaStore.CreateProject(ctx, project); err != nil {
+					return fmt.Errorf("failed to create project metadata: %w", err)
+				}
 			}
 
 			return nil
@@ -119,6 +172,8 @@ func indexCmd() *cobra.Command {
 
 	cmd.Flags().StringVarP(&projectPath, "path", "p", "", "Path to the project directory (required)")
 	cmd.Flags().StringVarP(&projectName, "name", "n", "", "Name of the project (required)")
+	cmd.Flags().StringVarP(&groupName, "group", "g", "", "Group name to organize projects")
+	cmd.Flags().StringVarP(&description, "description", "d", "", "Project description")
 	cmd.Flags().BoolVar(&clean, "clean", false, "Delete existing project data before indexing (ensures no orphaned chunks)")
 
 	return cmd
