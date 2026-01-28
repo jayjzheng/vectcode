@@ -58,6 +58,16 @@ func formatTimeAgo(t time.Time) string {
 	}
 }
 
+func formatProjectList(projects []string) string {
+	if len(projects) == 0 {
+		return ""
+	}
+	if len(projects) <= 3 {
+		return fmt.Sprintf("%v", projects)
+	}
+	return fmt.Sprintf("%s and %d more", projects[0], len(projects)-1)
+}
+
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "codegraph",
@@ -214,6 +224,7 @@ func queryCmd() *cobra.Command {
 		queryText   string
 		limit       int
 		projectName string
+		groupName   string
 	)
 
 	cmd := &cobra.Command{
@@ -225,11 +236,18 @@ func queryCmd() *cobra.Command {
 				return fmt.Errorf("--query is required")
 			}
 
+			// Can't specify both project and group
+			if projectName != "" && groupName != "" {
+				return fmt.Errorf("cannot specify both --project and --group")
+			}
+
 			// Load configuration
 			cfg, err := config.LoadOrDefault(getConfigPath())
 			if err != nil {
 				return fmt.Errorf("failed to load config: %w", err)
 			}
+
+			ctx := context.Background()
 
 			fmt.Printf("Querying: %s\n", queryText)
 
@@ -255,10 +273,37 @@ func queryCmd() *cobra.Command {
 					"project": projectName,
 				}
 				fmt.Printf("Filtering by project: %s\n", projectName)
+			} else if groupName != "" {
+				// Get projects in the group
+				metaStore, err := metadata.NewSQLiteStore(cfg.Metadata.DBPath)
+				if err != nil {
+					return fmt.Errorf("failed to create metadata store: %w", err)
+				}
+				defer metaStore.Close()
+
+				projects, err := metaStore.GetProjectsByGroup(ctx, groupName)
+				if err != nil {
+					return fmt.Errorf("failed to get projects in group: %w", err)
+				}
+
+				if len(projects) == 0 {
+					return fmt.Errorf("no projects found in group '%s'", groupName)
+				}
+
+				// Build list of project names
+				projectNames := make([]string, len(projects))
+				for i, proj := range projects {
+					projectNames[i] = proj.Name
+				}
+
+				filters = map[string]interface{}{
+					"projects": projectNames,
+				}
+				fmt.Printf("Filtering by group '%s' (%d projects: %s)\n",
+					groupName, len(projectNames), formatProjectList(projectNames))
 			}
 
 			// Execute query
-			ctx := context.Background()
 			results, err := engine.Query(ctx, queryText, limit, filters)
 			if err != nil {
 				return fmt.Errorf("query failed: %w", err)
@@ -285,6 +330,7 @@ func queryCmd() *cobra.Command {
 	cmd.Flags().StringVarP(&queryText, "query", "q", "", "Query text (required)")
 	cmd.Flags().IntVarP(&limit, "limit", "l", 5, "Maximum number of results")
 	cmd.Flags().StringVarP(&projectName, "project", "p", "", "Filter by project name")
+	cmd.Flags().StringVarP(&groupName, "group", "g", "", "Filter by group name (searches all projects in group)")
 
 	return cmd
 }

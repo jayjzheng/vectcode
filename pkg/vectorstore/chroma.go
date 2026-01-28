@@ -302,6 +302,19 @@ func buildWhereClause(filters map[string]interface{}) chroma.WhereFilter {
 			if strVal, ok := value.(string); ok {
 				clauses = append(clauses, chroma.EqString(chroma.K(key), strVal))
 			}
+		case "projects": // Multiple projects (OR)
+			if projects, ok := value.([]string); ok && len(projects) > 0 {
+				if len(projects) == 1 {
+					clauses = append(clauses, chroma.EqString(chroma.K("project"), projects[0]))
+				} else {
+					// Build OR clause for multiple projects
+					var projectClauses []chroma.WhereClause
+					for _, proj := range projects {
+						projectClauses = append(projectClauses, chroma.EqString(chroma.K("project"), proj))
+					}
+					clauses = append(clauses, chroma.Or(projectClauses...))
+				}
+			}
 		}
 	}
 
