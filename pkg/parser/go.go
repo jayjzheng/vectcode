@@ -37,10 +37,15 @@ func (p *GoParser) Parse(ctx context.Context, projectPath string, projectName st
 		if err != nil {
 			return err
 		}
-		
+
 		if info.IsDir() {
 			name := info.Name()
-			if name == "vendor" || name == "node_modules" || strings.HasPrefix(name, ".") {
+			// Skip vendor, node_modules, and hidden directories (but not "." or "..")
+			if name == "vendor" || name == "node_modules" {
+				return filepath.SkipDir
+			}
+			// Skip hidden directories, but allow "." and ".."
+			if len(name) > 1 && strings.HasPrefix(name, ".") {
 				return filepath.SkipDir
 			}
 			return nil
