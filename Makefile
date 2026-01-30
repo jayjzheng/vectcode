@@ -1,10 +1,10 @@
 .PHONY: build install test clean run-index run-query run-list
 
 build:
-	go build -o codegraph ./cmd/codegraph
+	go build -o vectcode ./cmd/vectcode
 
 install:
-	go install ./cmd/codegraph
+	go install ./cmd/vectcode
 
 test:
 	go test -v ./...
@@ -14,7 +14,7 @@ test-coverage:
 	go tool cover -html=coverage.out -o coverage.html
 
 clean:
-	rm -f codegraph coverage.out coverage.html
+	rm -f vectcode coverage.out coverage.html
 
 fmt:
 	go fmt ./...
@@ -25,13 +25,13 @@ deps:
 	go mod tidy
 
 run-index:
-	go run ./cmd/codegraph index --path ~/projects/example --name example
+	go run ./cmd/vectcode index --path ~/projects/example --name example
 
 run-query:
-	go run ./cmd/codegraph query --query "where is the authentication handler?"
+	go run ./cmd/vectcode query --query "where is the authentication handler?"
 
 run-list:
-	go run ./cmd/codegraph list
+	go run ./cmd/vectcode list
 
 dev: build
-	./codegraph --help
+	./vectcode --help

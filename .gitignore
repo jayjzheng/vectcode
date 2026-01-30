@@ -1,6 +1,6 @@
 # Binaries
-/codegraph
-/codegraph-mcp-server
+/vectcode
+/vectcode-mcp-server
 *.exe
 *.dll
 *.so
@@ -29,8 +29,8 @@ vendor/
 .DS_Store
 Thumbs.db
 
-# CodeGraph data
-.codegraph/
+# VectCode data
+.vectcode/
 config.yaml
 
 # Build

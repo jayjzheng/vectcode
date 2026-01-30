@@ -1,13 +1,13 @@
-# CodeGraph - Quick Start
+# VectCode - Quick Start
 
 ## 🎯 What You Have
 
-A complete scaffolding for CodeGraph - a tool to index and query multiple Go codebases using vector search and LLM.
+A complete scaffolding for VectCode - a tool to index and query multiple Go codebases using vector search and LLM.
 
 ## 📁 Project Location
 
 ```
-~/projects/codegraph/
+~/projects/vectcode/
 ```
 
 ## ✅ What's Complete
@@ -38,9 +38,9 @@ export PATH=$PATH:/usr/local/go/bin
 
 ### 2. Build the Project
 ```bash
-cd ~/projects/codegraph
+cd ~/projects/vectcode
 go mod tidy
-go build -o codegraph ./cmd/codegraph
+go build -o vectcode ./cmd/vectcode
 ```
 
 ### 3. Implement Core Features
@@ -56,21 +56,21 @@ go build -o codegraph ./cmd/codegraph
 - Implement Embed and EmbedBatch methods
 
 **Priority 3: Wire Everything**
-- Edit `cmd/codegraph/main.go`
-- Load config from `~/.codegraph/config.yaml`
+- Edit `cmd/vectcode/main.go`
+- Load config from `~/.vectcode/config.yaml`
 - Initialize parser, embedder, vectorstore, and indexer
 
 ### 4. Test It
 
 ```bash
 # Index a project
-./codegraph index --path ~/projects/your-service --name your-service
+./vectcode index --path ~/projects/your-service --name your-service
 
 # Query it
-./codegraph query --query "where is the authentication handler?"
+./vectcode query --query "where is the authentication handler?"
 
 # List indexed projects
-./codegraph list
+./vectcode list
 ```
 
 ## 📊 Project Stats
@@ -84,8 +84,8 @@ go build -o codegraph ./cmd/codegraph
 
 1. `pkg/vectorstore/chroma.go` - Add Chroma integration
 2. `pkg/embedder/openai.go` - Add OpenAI API calls
-3. `cmd/codegraph/main.go` - Wire components together
-4. `~/.codegraph/config.yaml` - Configure API keys and settings
+3. `cmd/vectcode/main.go` - Wire components together
+4. `~/.vectcode/config.yaml` - Configure API keys and settings
 
 ## 💡 Tips
 

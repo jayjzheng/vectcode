@@ -7,8 +7,8 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/yourusername/codegraph/pkg/embedder"
-	"github.com/yourusername/codegraph/pkg/vectorstore"
+	"github.com/jayzheng/vectcode/pkg/embedder"
+	"github.com/jayzheng/vectcode/pkg/vectorstore"
 )
 
 // Config represents the application configuration
@@ -90,14 +90,14 @@ func LoadOrDefault(configPath string) (*Config, error) {
 // DefaultConfig returns a default configuration
 func DefaultConfig() *Config {
 	home, _ := os.UserHomeDir()
-	dbPath := filepath.Join(home, ".codegraph", "db")
-	metadataPath := filepath.Join(home, ".codegraph", "metadata.db")
+	dbPath := filepath.Join(home, ".vectcode", "db")
+	metadataPath := filepath.Join(home, ".vectcode", "metadata.db")
 
 	return &Config{
 		VectorStore: VectorStoreConfig{
 			Type:       "chroma",
 			Path:       dbPath,
-			Collection: "codegraph",
+			Collection: "vectcode",
 		},
 		Embeddings: embedder.Config{
 			Provider: "ollama",

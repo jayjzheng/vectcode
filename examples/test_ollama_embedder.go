@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/yourusername/codegraph/pkg/embedder"
+	"github.com/jayzheng/vectcode/pkg/embedder"
 )
 
 func main() {

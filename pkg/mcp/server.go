@@ -6,13 +6,13 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/yourusername/codegraph/pkg/config"
-	"github.com/yourusername/codegraph/pkg/embedder"
-	"github.com/yourusername/codegraph/pkg/query"
-	"github.com/yourusername/codegraph/pkg/vectorstore"
+	"github.com/jayzheng/vectcode/pkg/config"
+	"github.com/jayzheng/vectcode/pkg/embedder"
+	"github.com/jayzheng/vectcode/pkg/query"
+	"github.com/jayzheng/vectcode/pkg/vectorstore"
 )
 
-// Server implements an MCP server for CodeGraph
+// Server implements an MCP server for VectCode
 type Server struct {
 	config      *config.Config
 	embedder    embedder.Embedder
@@ -125,7 +125,7 @@ func (s *Server) handleInitialize(req *JSONRPCRequest) *JSONRPCResponse {
 	result := InitializeResult{
 		ProtocolVersion: "2024-11-05",
 		ServerInfo: ServerInfo{
-			Name:    "codegraph",
+			Name:    "vectcode",
 			Version: "0.1.0",
 		},
 		Capabilities: map[string]interface{}{

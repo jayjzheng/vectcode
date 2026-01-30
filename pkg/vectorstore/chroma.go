@@ -10,7 +10,7 @@ import (
 
 	chroma "github.com/amikos-tech/chroma-go/pkg/api/v2"
 	"github.com/amikos-tech/chroma-go/pkg/embeddings"
-	"github.com/yourusername/codegraph/pkg/chunker"
+	"github.com/jayzheng/vectcode/pkg/chunker"
 )
 
 // ChromaStore implements VectorStore for ChromaDB
@@ -34,7 +34,7 @@ func NewChromaStore(config Config) (*ChromaStore, error) {
 	// Get collection name
 	collectionName := config.Collection
 	if collectionName == "" {
-		collectionName = "codegraph"
+		collectionName = "vectcode"
 	}
 
 	// Get or create collection with cosine similarity
@@ -64,7 +64,7 @@ func (c *ChromaStore) Insert(ctx context.Context, chunk chunker.CodeChunk, embed
 	metadata := chunkToMetadata(chunk)
 	emb := embeddings.NewEmbeddingFromFloat64(embedding)
 
-	err := c.collection.Add(
+	err := c.collection.Upsert(
 		ctx,
 		chroma.WithIDs(chroma.DocumentID(chunk.ID)),
 		chroma.WithTexts(chunk.Code),
@@ -112,8 +112,8 @@ func (c *ChromaStore) InsertBatch(ctx context.Context, chunks []chunker.CodeChun
 			embeddingsList[j] = embeddings.NewEmbeddingFromFloat64(batchEmbeddings[j])
 		}
 
-		// Insert batch
-		err := c.collection.Add(
+		// Insert batch (using Upsert to support re-indexing)
+		err := c.collection.Upsert(
 			ctx,
 			chroma.WithIDs(ids...),
 			chroma.WithTexts(documents...),

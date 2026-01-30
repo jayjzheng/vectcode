@@ -5,15 +5,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/yourusername/codegraph/pkg/mcp"
+	"github.com/jayzheng/vectcode/pkg/mcp"
 )
 
 func main() {
 	// Get config path from environment or use default
-	configPath := os.Getenv("CODEGRAPH_CONFIG")
+	configPath := os.Getenv("VECTCODE_CONFIG")
 	if configPath == "" {
 		home, _ := os.UserHomeDir()
-		configPath = filepath.Join(home, ".codegraph", "config.yaml")
+		configPath = filepath.Join(home, ".vectcode", "config.yaml")
 	}
 
 	// Create and run MCP server

@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 	
-	"github.com/yourusername/codegraph/pkg/chunker"
+	"github.com/jayzheng/vectcode/pkg/chunker"
 )
 
 // GoParser implements Parser for Go language

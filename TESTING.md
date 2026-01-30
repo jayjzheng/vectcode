@@ -1,6 +1,6 @@
-# Testing CodeGraph
+# Testing VectCode
 
-This guide will help you test the CodeGraph CLI with the Ollama embedder integration.
+This guide will help you test the VectCode CLI with the Ollama embedder integration.
 
 ## Prerequisites
 
@@ -32,23 +32,23 @@ Verify it's running:
 curl http://localhost:11434/api/tags
 ```
 
-## Build CodeGraph
+## Build VectCode
 
 ```bash
 # From the project root
-go build -o codegraph ./cmd/codegraph
+go build -o vectcode ./cmd/vectcode
 
 # Verify build
-./codegraph --version
+./vectcode --version
 ```
 
 ## Configuration
 
-The CLI will use `~/.codegraph/config.yaml` by default. Create it:
+The CLI will use `~/.vectcode/config.yaml` by default. Create it:
 
 ```bash
-mkdir -p ~/.codegraph
-cp config.example.yaml ~/.codegraph/config.yaml
+mkdir -p ~/.vectcode
+cp config.example.yaml ~/.vectcode/config.yaml
 ```
 
 Default configuration uses Ollama with BGE-M3:
@@ -63,25 +63,25 @@ embeddings:
 
 ### Test 1: Index a Sample Project
 
-Index the codegraph project itself:
+Index the vectcode project itself:
 
 ```bash
-./codegraph index \
+./vectcode index \
   --path . \
-  --name codegraph
+  --name vectcode
 ```
 
 **Expected Output:**
 ```
-Indexing project: codegraph from path: .
+Indexing project: vectcode from path: .
 Initializing embedder...
 Initializing vector store...
 Initializing parser...
-Parsing project: codegraph
+Parsing project: vectcode
 Found X code chunks
 Generating embeddings...
 Storing in vector database...
-Successfully indexed project: codegraph
+Successfully indexed project: vectcode
 ```
 
 **Note:** This will currently fail at the vector store step because ChromaDB is not implemented yet. Expected error:
@@ -122,16 +122,16 @@ Generating batch embeddings for 3 code snippets...
 
 ```bash
 # Show help
-./codegraph --help
+./vectcode --help
 
 # Show index command help
-./codegraph index --help
+./vectcode index --help
 
 # Show query command help
-./codegraph query --help
+./vectcode query --help
 
 # List projects (will fail - vector store not implemented)
-./codegraph list
+./vectcode list
 ```
 
 ## Current Limitations
@@ -187,8 +187,8 @@ ollama pull bge-m3
 
 Config file doesn't exist. Create it:
 ```bash
-mkdir -p ~/.codegraph
-cp config.example.yaml ~/.codegraph/config.yaml
+mkdir -p ~/.vectcode
+cp config.example.yaml ~/.vectcode/config.yaml
 ```
 
 ### "Not implemented yet" (vector store)

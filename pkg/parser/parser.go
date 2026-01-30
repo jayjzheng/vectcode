@@ -3,7 +3,7 @@ package parser
 import (
 	"context"
 	
-	"github.com/yourusername/codegraph/pkg/chunker"
+	"github.com/jayzheng/vectcode/pkg/chunker"
 )
 
 // Parser defines the interface for language-specific code parsers

@@ -1,4 +1,4 @@
-# Getting Started with CodeGraph
+# Getting Started with VectCode
 
 ## Prerequisites
 
@@ -15,9 +15,9 @@
 ### 1. Clone and build
 
 ```bash
-cd ~/projects/codegraph
+cd ~/projects/vectcode
 go mod tidy
-go build -o codegraph ./cmd/codegraph
+go build -o vectcode ./cmd/vectcode
 ```
 
 Or use the Makefile:
@@ -31,11 +31,11 @@ make build
 Copy the example config:
 
 ```bash
-mkdir -p ~/.codegraph
-cp config.example.yaml ~/.codegraph/config.yaml
+mkdir -p ~/.vectcode
+cp config.example.yaml ~/.vectcode/config.yaml
 ```
 
-Edit `~/.codegraph/config.yaml` and set your preferences.
+Edit `~/.vectcode/config.yaml` and set your preferences.
 
 ### 3. Set environment variables
 
@@ -61,27 +61,27 @@ The scaffolding is complete! Here's what needs to be implemented:
    - Add batch embedding support
 
 3. **Wire it all together**
-   - Update `cmd/codegraph/main.go` to actually use the packages
-   - Load config from `~/.codegraph/config.yaml`
+   - Update `cmd/vectcode/main.go` to actually use the packages
+   - Load config from `~/.vectcode/config.yaml`
    - Initialize components properly
 
 ### Phase 2: Testing (Week 2-3)
 
 1. **Index a test project**
    ```bash
-   ./codegraph index --path ~/projects/test-service --name test-service
+   ./vectcode index --path ~/projects/test-service --name test-service
    ```
 
 2. **Query the codebase**
    ```bash
-   ./codegraph query --query "where is the HTTP handler?"
+   ./vectcode query --query "where is the HTTP handler?"
    ```
 
 3. **Test with multiple projects**
    ```bash
-   ./codegraph index --path ~/projects/user-service --name user-service
-   ./codegraph index --path ~/projects/property-service --name property-service
-   ./codegraph query --query "show me all authentication code"
+   ./vectcode index --path ~/projects/user-service --name user-service
+   ./vectcode index --path ~/projects/property-service --name property-service
+   ./vectcode query --query "show me all authentication code"
    ```
 
 ### Phase 3: Enhancements (Week 3-4)
@@ -103,8 +103,8 @@ The scaffolding is complete! Here's what needs to be implemented:
 ## Project Structure
 
 ```
-codegraph/
-├── cmd/codegraph/          # CLI entry point
+vectcode/
+├── cmd/vectcode/          # CLI entry point
 │   └── main.go
 ├── pkg/
 │   ├── chunker/           # Code chunk data structures
@@ -167,23 +167,23 @@ require (
 
 ### Index a project
 ```bash
-codegraph index --path ~/projects/my-service --name my-service
+vectcode index --path ~/projects/my-service --name my-service
 ```
 
 ### Query
 ```bash
-codegraph query --query "authentication handler" --limit 5
-codegraph query --query "HTTP endpoints" --project user-service
+vectcode query --query "authentication handler" --limit 5
+vectcode query --query "HTTP endpoints" --project user-service
 ```
 
 ### List projects
 ```bash
-codegraph list
+vectcode list
 ```
 
 ### Delete a project
 ```bash
-codegraph delete --name my-service
+vectcode delete --name my-service
 ```
 
 ## Tips

@@ -120,10 +120,10 @@ ChromaDB Go client doesn't require explicit cleanup, so return nil.
 
 ## Critical Files
 
-1. **`/Users/jayzheng/projects/codegraph/pkg/vectorstore/chroma.go`** - Main implementation file
-2. **`/Users/jayzheng/projects/codegraph/pkg/chunker/chunker.go`** - CodeChunk structure reference
-3. **`/Users/jayzheng/projects/codegraph/pkg/vectorstore/vectorstore.go`** - Interface contract
-4. **`/Users/jayzheng/projects/codegraph/config.example.yaml`** - Update with ChromaDB setup instructions
+1. **`/Users/jayzheng/projects/vectcode/pkg/vectorstore/chroma.go`** - Main implementation file
+2. **`/Users/jayzheng/projects/vectcode/pkg/chunker/chunker.go`** - CodeChunk structure reference
+3. **`/Users/jayzheng/projects/vectcode/pkg/vectorstore/vectorstore.go`** - Interface contract
+4. **`/Users/jayzheng/projects/vectcode/config.example.yaml`** - Update with ChromaDB setup instructions
 
 ## Configuration Updates
 
@@ -131,8 +131,8 @@ Update `config.example.yaml` to document ChromaDB options:
 ```yaml
 vector_store:
   type: chroma
-  path: ~/.codegraph/db  # Local persistence (not used for HTTP client)
-  collection: codegraph
+  path: ~/.vectcode/db  # Local persistence (not used for HTTP client)
+  collection: vectcode
   options:
     endpoint: http://localhost:8000  # ChromaDB server URL (optional)
 ```
@@ -165,46 +165,46 @@ docker run -p 8000:8000 chromadb/chroma
 docker run -p 8000:8000 chromadb/chroma
 
 # 2. Build CLI
-go build -o codegraph ./cmd/codegraph
+go build -o vectcode ./cmd/vectcode
 
 # 3. Index a project
-./codegraph index --path . --name codegraph
+./vectcode index --path . --name vectcode
 
 # Expected output:
-# Indexing project: codegraph from path: .
+# Indexing project: vectcode from path: .
 # Initializing embedder...
 # Initializing vector store...
 # Initializing parser...
-# Parsing project: codegraph
+# Parsing project: vectcode
 # Found X code chunks
 # Generating embeddings...
 # Storing in vector database...
-# Successfully indexed project: codegraph
+# Successfully indexed project: vectcode
 
 # 4. Query the codebase
-./codegraph query --query "embedder implementation" --limit 5
+./vectcode query --query "embedder implementation" --limit 5
 
 # Expected output:
 # Found 5 results:
 # === Result 1 (Score: 0.85) ===
-# Project: codegraph
+# Project: vectcode
 # File: pkg/embedder/ollama.go:27-45
 # Type: function Embed
 # [code shown]
 
 # 5. List projects
-./codegraph list
+./vectcode list
 
 # Expected output:
 # Indexed projects (1):
-#   1. codegraph
+#   1. vectcode
 
 # 6. Delete project
-./codegraph delete --name codegraph
+./vectcode delete --name vectcode
 
 # Expected output:
-# Deleting project: codegraph
-# ✓ Project 'codegraph' deleted successfully
+# Deleting project: vectcode
+# ✓ Project 'vectcode' deleted successfully
 ```
 
 ## Potential Issues & Mitigations

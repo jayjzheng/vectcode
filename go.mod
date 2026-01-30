@@ -1,4 +1,4 @@
-module github.com/yourusername/codegraph
+module github.com/jayzheng/vectcode
 
 go 1.24.11
 

@@ -7,7 +7,7 @@
 ### Required Workflow:
 1. **Semantic Search First**:
    ```bash
-   ./codegraph query --query "relevant functionality" --project <project-name> --limit 5
+   ./vectcode query --query "relevant functionality" --project <project-name> --limit 5
    ```
 
 2. **Read Specific Files** - Based on search results
@@ -16,7 +16,7 @@
 
 ## Currently Indexed Projects
 
-### codegraph (this project)
+### vectcode (this project)
 - **Description**: Semantic code search tool with vector embeddings and ChromaDB
 - **Group**: `coding`
 - **Chunks**: 133
@@ -27,26 +27,26 @@
 - **Group**: `fantasy football data`
 - **Chunks**: 96
 
-## Working on CodeGraph Itself
+## Working on VectCode Itself
 
-**YES, search codegraph semantically too!**
+**YES, search vectcode semantically too!**
 
 ### Examples for this codebase:
 ```bash
 # Find metadata store implementation
-./codegraph query --query "metadata store SQLite" --project codegraph
+./vectcode query --query "metadata store SQLite" --project vectcode
 
 # Find ChromaDB integration
-./codegraph query --query "vector search ChromaDB" --project codegraph
+./vectcode query --query "vector search ChromaDB" --project vectcode
 
 # Find CLI command handlers
-./codegraph query --query "index command implementation" --project codegraph
+./vectcode query --query "index command implementation" --project vectcode
 
-# Search the coding group (includes codegraph)
-./codegraph query --query "configuration loading" --group coding
+# Search the coding group (includes vectcode)
+./vectcode query --query "configuration loading" --group coding
 ```
 
-### Why search codegraph itself:
+### Why search vectcode itself:
 - 133 chunks indexed across all packages
 - Finds relevant code by semantic meaning
 - Faster than browsing directory structure
@@ -56,34 +56,34 @@
 
 ```bash
 # Search specific project
-./codegraph query --query "your search" --project <name> --limit 5
+./vectcode query --query "your search" --project <name> --limit 5
 
 # Search by group
-./codegraph query --query "your search" --group <group-name>
+./vectcode query --query "your search" --group <group-name>
 
 # Get project info
-./codegraph info --name <name>
+./vectcode info --name <name>
 
 # List projects
-./codegraph list --detailed
-./codegraph list --group <group-name>
+./vectcode list --detailed
+./vectcode list --group <group-name>
 
 # Manage groups
-./codegraph group list
-./codegraph group create --name <name> --description "..."
+./vectcode group list
+./vectcode group create --name <name> --description "..."
 ```
 
 ## Testing Changes
 
-After making changes to codegraph:
-1. Rebuild: `go build -o codegraph ./cmd/codegraph`
+After making changes to vectcode:
+1. Rebuild: `go build -o vectcode ./cmd/vectcode`
 2. Test the specific feature changed
 3. Commit with descriptive message
-4. Consider re-indexing if major changes: `./codegraph index --path . --name codegraph --clean`
+4. Consider re-indexing if major changes: `./vectcode index --path . --name vectcode --clean`
 
 ## User Preference
 
-The user wants semantic search used for ALL projects, including codegraph itself. This provides:
+The user wants semantic search used for ALL projects, including vectcode itself. This provides:
 - Better context discovery
 - Semantic understanding (not just keyword matching)
 - Faster navigation through 133+ code chunks

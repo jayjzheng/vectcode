@@ -9,13 +9,13 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/yourusername/codegraph/pkg/config"
-	"github.com/yourusername/codegraph/pkg/embedder"
-	"github.com/yourusername/codegraph/pkg/indexer"
-	"github.com/yourusername/codegraph/pkg/metadata"
-	"github.com/yourusername/codegraph/pkg/parser"
-	"github.com/yourusername/codegraph/pkg/query"
-	"github.com/yourusername/codegraph/pkg/vectorstore"
+	"github.com/jayzheng/vectcode/pkg/config"
+	"github.com/jayzheng/vectcode/pkg/embedder"
+	"github.com/jayzheng/vectcode/pkg/indexer"
+	"github.com/jayzheng/vectcode/pkg/metadata"
+	"github.com/jayzheng/vectcode/pkg/parser"
+	"github.com/jayzheng/vectcode/pkg/query"
+	"github.com/jayzheng/vectcode/pkg/vectorstore"
 )
 
 var version = "0.1.0"
@@ -27,7 +27,7 @@ func getConfigPath() string {
 		return configPath
 	}
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".codegraph", "config.yaml")
+	return filepath.Join(home, ".vectcode", "config.yaml")
 }
 
 func formatTimeAgo(t time.Time) string {
@@ -70,14 +70,14 @@ func formatProjectList(projects []string) string {
 
 func main() {
 	rootCmd := &cobra.Command{
-		Use:   "codegraph",
-		Short: "CodeGraph - A code knowledge base tool",
-		Long: `CodeGraph ingests multiple code repositories and creates a queryable
+		Use:   "vectcode",
+		Short: "VectCode - A code knowledge base tool",
+		Long: `VectCode ingests multiple code repositories and creates a queryable
 vector store for LLM-powered code understanding.`,
 		Version: version,
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "Path to config file (default: ~/.codegraph/config.yaml)")
+	rootCmd.PersistentFlags().StringVarP(&configPath, "config", "c", "", "Path to config file (default: ~/.vectcode/config.yaml)")
 
 	rootCmd.AddCommand(indexCmd())
 	rootCmd.AddCommand(queryCmd())

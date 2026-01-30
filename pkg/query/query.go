@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	
-	"github.com/yourusername/codegraph/pkg/embedder"
-	"github.com/yourusername/codegraph/pkg/vectorstore"
+	"github.com/jayzheng/vectcode/pkg/embedder"
+	"github.com/jayzheng/vectcode/pkg/vectorstore"
 )
 
 // Engine handles queries against the code knowledge base

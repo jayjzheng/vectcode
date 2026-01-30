@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 	
-	"github.com/yourusername/codegraph/pkg/chunker"
-	"github.com/yourusername/codegraph/pkg/embedder"
-	"github.com/yourusername/codegraph/pkg/parser"
-	"github.com/yourusername/codegraph/pkg/vectorstore"
+	"github.com/jayzheng/vectcode/pkg/chunker"
+	"github.com/jayzheng/vectcode/pkg/embedder"
+	"github.com/jayzheng/vectcode/pkg/parser"
+	"github.com/jayzheng/vectcode/pkg/vectorstore"
 )
 
 // Indexer orchestrates the indexing process

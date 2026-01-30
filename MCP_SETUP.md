@@ -1,26 +1,26 @@
-# CodeGraph MCP Server Setup
+# VectCode MCP Server Setup
 
-This guide shows you how to use CodeGraph as an MCP (Model Context Protocol) server with Claude Desktop and other LLM clients.
+This guide shows you how to use VectCode as an MCP (Model Context Protocol) server with Claude Desktop and other LLM clients.
 
 ## What is MCP?
 
-MCP (Model Context Protocol) allows LLMs like Claude to access external tools and data sources during conversations. With CodeGraph as an MCP server, Claude can search through your indexed codebases in real-time.
+MCP (Model Context Protocol) allows LLMs like Claude to access external tools and data sources during conversations. With VectCode as an MCP server, Claude can search through your indexed codebases in real-time.
 
 ## Prerequisites
 
-1. **CodeGraph with indexed projects**:
+1. **VectCode with indexed projects**:
    ```bash
    # Make sure you've indexed some projects
-   ./codegraph list
+   ./vectcode list
    ```
 
 2. **MCP server binary**:
    ```bash
    # Build the MCP server
-   go build -o codegraph-mcp-server ./cmd/mcp-server
+   go build -o vectcode-mcp-server ./cmd/mcp-server
 
    # Move to a permanent location (optional)
-   sudo cp codegraph-mcp-server /usr/local/bin/
+   sudo cp vectcode-mcp-server /usr/local/bin/
    ```
 
 3. **Running services**:
@@ -44,25 +44,25 @@ Edit your `claude_desktop_config.json` file:
 ```json
 {
   "mcpServers": {
-    "codegraph": {
-      "command": "/path/to/codegraph-mcp-server",
+    "vectcode": {
+      "command": "/path/to/vectcode-mcp-server",
       "env": {
-        "CODEGRAPH_CONFIG": "/Users/yourusername/.codegraph/config.yaml"
+        "VECTCODE_CONFIG": "/Users/yourusername/.vectcode/config.yaml"
       }
     }
   }
 }
 ```
 
-**Important**: Replace `/path/to/codegraph-mcp-server` with the actual path to your binary.
+**Important**: Replace `/path/to/vectcode-mcp-server` with the actual path to your binary.
 
 #### Example (macOS):
 
 ```json
 {
   "mcpServers": {
-    "codegraph": {
-      "command": "/usr/local/bin/codegraph-mcp-server"
+    "vectcode": {
+      "command": "/usr/local/bin/vectcode-mcp-server"
     }
   }
 }
@@ -73,8 +73,8 @@ Or if using the binary from your project directory:
 ```json
 {
   "mcpServers": {
-    "codegraph": {
-      "command": "/Users/jayzheng/projects/codegraph/codegraph-mcp-server"
+    "vectcode": {
+      "command": "/Users/jayzheng/projects/vectcode/vectcode-mcp-server"
     }
   }
 }
@@ -86,19 +86,19 @@ Close and reopen Claude Desktop for the changes to take effect.
 
 ### 4. Verify Connection
 
-In Claude Desktop, you should see a 🔨 (hammer) icon indicating MCP tools are available. Click it to see the CodeGraph tools:
+In Claude Desktop, you should see a 🔨 (hammer) icon indicating MCP tools are available. Click it to see the VectCode tools:
 
 - **search_code**: Search indexed codebases
 - **list_projects**: List all indexed projects
 
-## Using CodeGraph in Claude Conversations
+## Using VectCode in Claude Conversations
 
 Once configured, you can ask Claude to search your code:
 
 ### Example Conversations:
 
 **List projects**:
-> "What projects are indexed in CodeGraph?"
+> "What projects are indexed in VectCode?"
 
 **Search code**:
 > "Search for functions that fetch team data"
@@ -158,30 +158,30 @@ Lists all indexed projects available for search.
 
 3. Test MCP server manually:
    ```bash
-   echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | ./codegraph-mcp-server
+   echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | ./vectcode-mcp-server
    ```
 
 ### No Projects Found
 
 Index some projects first:
 ```bash
-./codegraph index --path ~/projects/myproject --name myproject
-./codegraph list
+./vectcode index --path ~/projects/myproject --name myproject
+./vectcode list
 ```
 
 ## Configuration
 
-The MCP server uses the same config as the CLI tool: `~/.codegraph/config.yaml`
+The MCP server uses the same config as the CLI tool: `~/.vectcode/config.yaml`
 
-You can override the config path with the `CODEGRAPH_CONFIG` environment variable in your Claude Desktop config:
+You can override the config path with the `VECTCODE_CONFIG` environment variable in your Claude Desktop config:
 
 ```json
 {
   "mcpServers": {
-    "codegraph": {
-      "command": "/path/to/codegraph-mcp-server",
+    "vectcode": {
+      "command": "/path/to/vectcode-mcp-server",
       "env": {
-        "CODEGRAPH_CONFIG": "/custom/path/to/config.yaml"
+        "VECTCODE_CONFIG": "/custom/path/to/config.yaml"
       }
     }
   }
@@ -193,10 +193,10 @@ You can override the config path with the `CODEGRAPH_CONFIG` environment variabl
 ```json
 {
   "mcpServers": {
-    "codegraph": {
-      "command": "/usr/local/bin/codegraph-mcp-server",
+    "vectcode": {
+      "command": "/usr/local/bin/vectcode-mcp-server",
       "env": {
-        "CODEGRAPH_CONFIG": "/Users/jayzheng/.codegraph/config.yaml"
+        "VECTCODE_CONFIG": "/Users/jayzheng/.vectcode/config.yaml"
       }
     }
   }

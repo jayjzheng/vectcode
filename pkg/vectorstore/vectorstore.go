@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/yourusername/codegraph/pkg/chunker"
+	"github.com/jayzheng/vectcode/pkg/chunker"
 )
 
 // SearchResult represents a search result from the vector store

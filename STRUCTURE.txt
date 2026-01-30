@@ -1,10 +1,10 @@
-CodeGraph Project Structure
+VectCode Project Structure
 ===========================
 
-codegraph/
+vectcode/
 │
 ├── cmd/
-│   └── codegraph/
+│   └── vectcode/
 │       └── main.go                 # CLI entry point with Cobra commands
 │
 ├── pkg/
@@ -50,13 +50,13 @@ IMPLEMENTED:
    - Documentation extraction
 
 ✅ pkg/chunker/chunker.go - CodeChunk data structure
-✅ cmd/codegraph/main.go - CLI framework
+✅ cmd/vectcode/main.go - CLI framework
 ✅ All interfaces defined
 
 TODO:
 🔲 pkg/vectorstore/chroma.go - Add Chroma client
 🔲 pkg/embedder/openai.go - Add OpenAI API calls
-🔲 cmd/codegraph/main.go - Wire up actual implementations
+🔲 cmd/vectcode/main.go - Wire up actual implementations
 🔲 Config loading from YAML file
 
 Lines of Code:

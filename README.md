@@ -1,4 +1,4 @@
-# CodeGraph
+# VectCode
 
 A semantic code search tool that indexes code repositories into a vector database, enabling natural language search across your codebase.
 
@@ -7,7 +7,7 @@ A semantic code search tool that indexes code repositories into a vector databas
 - **Multi-repository indexing**: Index multiple Go projects into a unified knowledge base
 - **Semantic search**: Query your codebase using natural language via vector embeddings
 - **ChromaDB integration**: Fast vector storage and retrieval
-- **MCP Server**: Use CodeGraph with Claude Desktop and other LLM clients via Model Context Protocol
+- **MCP Server**: Use VectCode with Claude Desktop and other LLM clients via Model Context Protocol
 - **Ollama embeddings**: Free, local embeddings with BGE-M3 model (or OpenAI alternative)
 
 ## Installation
@@ -32,10 +32,10 @@ A semantic code search tool that indexes code repositories into a vector databas
 
 ```bash
 # Build CLI tool
-go build -o codegraph ./cmd/codegraph
+go build -o vectcode ./cmd/vectcode
 
 # Build MCP server (optional, for Claude Desktop integration)
-go build -o codegraph-mcp-server ./cmd/mcp-server
+go build -o vectcode-mcp-server ./cmd/mcp-server
 ```
 
 ## Quick Start
@@ -43,45 +43,45 @@ go build -o codegraph-mcp-server ./cmd/mcp-server
 ### 1. Setup Configuration
 
 ```bash
-mkdir -p ~/.codegraph
-cp config.example.yaml ~/.codegraph/config.yaml
+mkdir -p ~/.vectcode
+cp config.example.yaml ~/.vectcode/config.yaml
 ```
 
-Edit `~/.codegraph/config.yaml` to configure ChromaDB and Ollama endpoints.
+Edit `~/.vectcode/config.yaml` to configure ChromaDB and Ollama endpoints.
 
 ### 2. Index a Project
 
 ```bash
-./codegraph index --path ~/projects/my-service --name my-service
+./vectcode index --path ~/projects/my-service --name my-service
 ```
 
 **Re-indexing with clean slate:**
 ```bash
 # Use --clean to delete existing data first (removes orphaned chunks from deleted code)
-./codegraph index --path ~/projects/my-service --name my-service --clean
+./vectcode index --path ~/projects/my-service --name my-service --clean
 ```
 
 ### 3. Query the Codebase
 
 ```bash
-./codegraph query --query "where is the user authentication handler?" --limit 5
+./vectcode query --query "where is the user authentication handler?" --limit 5
 ```
 
 ### 4. List Indexed Projects
 
 ```bash
-./codegraph list
+./vectcode list
 ```
 
 ### 5. Delete a Project
 
 ```bash
-./codegraph delete --name my-service
+./vectcode delete --name my-service
 ```
 
 ## MCP Server (Claude Desktop Integration)
 
-CodeGraph can be used as an MCP (Model Context Protocol) server, allowing Claude Desktop and other LLM clients to search your indexed codebases during conversations.
+VectCode can be used as an MCP (Model Context Protocol) server, allowing Claude Desktop and other LLM clients to search your indexed codebases during conversations.
 
 See [MCP_SETUP.md](MCP_SETUP.md) for detailed setup instructions.
 
@@ -89,16 +89,16 @@ See [MCP_SETUP.md](MCP_SETUP.md) for detailed setup instructions.
 
 1. Build the MCP server:
    ```bash
-   go build -o codegraph-mcp-server ./cmd/mcp-server
-   sudo cp codegraph-mcp-server /usr/local/bin/
+   go build -o vectcode-mcp-server ./cmd/mcp-server
+   sudo cp vectcode-mcp-server /usr/local/bin/
    ```
 
 2. Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
    ```json
    {
      "mcpServers": {
-       "codegraph": {
-         "command": "/usr/local/bin/codegraph-mcp-server"
+       "vectcode": {
+         "command": "/usr/local/bin/vectcode-mcp-server"
        }
      }
    }
@@ -111,17 +111,17 @@ See [MCP_SETUP.md](MCP_SETUP.md) for detailed setup instructions.
 All commands support a `--config` flag to specify a custom config file:
 
 ```bash
-./codegraph --config /path/to/config.yaml index --path . --name myproject
+./vectcode --config /path/to/config.yaml index --path . --name myproject
 ```
 
 ## Configuration
 
-CodeGraph uses a configuration file at `~/.codegraph/config.yaml`:
+VectCode uses a configuration file at `~/.vectcode/config.yaml`:
 
 ```yaml
 vector_store:
   type: chroma
-  collection: codegraph
+  collection: vectcode
   options:
     endpoint: http://localhost:8000
 
@@ -140,9 +140,9 @@ embeddings:
 ## Architecture
 
 ```
-codegraph/
+vectcode/
 ├── cmd/
-│   ├── codegraph/      # CLI entry point
+│   ├── vectcode/      # CLI entry point
 │   └── mcp-server/     # MCP server for LLM integration
 ├── pkg/
 │   ├── parser/         # Code parsing (AST analysis)
@@ -157,7 +157,7 @@ codegraph/
 
 ## How It Works
 
-1. **Parsing**: CodeGraph parses Go source files using AST analysis to extract:
+1. **Parsing**: VectCode parses Go source files using AST analysis to extract:
    - Functions and methods
    - Struct and interface definitions
    - Constants and global variables
@@ -192,7 +192,7 @@ Currently supported:
 
 ## Re-indexing Behavior
 
-When you re-index a project, CodeGraph uses deterministic IDs (based on `project:file:name`) to handle updates:
+When you re-index a project, VectCode uses deterministic IDs (based on `project:file:name`) to handle updates:
 
 **Without `--clean` flag:**
 - Existing code chunks are **updated** (upsert behavior)
