@@ -117,8 +117,17 @@ func (p *GoParser) extractFunction(fset *token.FileSet, fn *ast.FuncDecl, filePa
 	var buf bytes.Buffer
 	printer.Fprint(&buf, fset, fn)
 
+	// Generate unique ID for methods by including receiver type
+	name := fn.Name.Name
+	if fn.Recv != nil && len(fn.Recv.List) > 0 {
+		receiverType := p.extractReceiverType(fn.Recv)
+		// Strip pointer prefix if present (e.g., "*QBStats" -> "QBStats")
+		receiverType = strings.TrimPrefix(receiverType, "*")
+		name = fmt.Sprintf("%s.%s", receiverType, name)
+	}
+
 	chunk := chunker.CodeChunk{
-		ID:           generateID(projectName, filePath, fn.Name.Name),
+		ID:           generateID(projectName, filePath, name),
 		Project:      projectName,
 		FilePath:     filePath,
 		Package:      packageName,
@@ -130,7 +139,7 @@ func (p *GoParser) extractFunction(fset *token.FileSet, fn *ast.FuncDecl, filePa
 		LineEnd:      fset.Position(fn.End()).Line,
 		LastModified: modTime,
 	}
-	
+
 	if fn.Recv != nil && len(fn.Recv.List) > 0 {
 		chunk.ChunkType = chunker.ChunkTypeMethod
 		chunk.Receiver = p.extractReceiverType(fn.Recv)
